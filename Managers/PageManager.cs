@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 namespace Omniaudio.Managers
 {
+    /// <summary>
+    /// Keeps track of the current page that is being executed during the program lifetime.
+    /// This singleton facilitates all page navigation, as well as cleanup routines.
+    /// </summary>
     public sealed class PageManager
     {
         

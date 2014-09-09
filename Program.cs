@@ -12,15 +12,11 @@ using Omniaudio.Properties;
 
 namespace Omniaudio
 {
-  /*
-   * GENERAL NOTES
-   * 
-   *      put stuff ehre
-   * */
+ 
     class Program
     {
         public static volatile bool hasQuit = false;
-        public static Thread inputWorker;
+        public static Thread inputWorker; // basically allows "real-time" input for the textual user interface
         public static HandlerRoutine routine = new HandlerRoutine(ConsoleCtrlCheck);
         static void Main(string[] args)
         {
