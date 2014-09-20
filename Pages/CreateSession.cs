@@ -97,8 +97,7 @@ namespace Omniaudio.Pages
             fields.Add(new InputField(recX + 16, recY + 7, 12, 1, ref rBuffer, 15, false, _ip, CheckIP));
             fields.Add(new InputField(recX + 16, recY + 9, 12, 1, ref rBuffer, 5, false, "49168",CheckPort));
             fields.Add(new InputField(recX + 16, recY + 11, 12, 1, ref rBuffer, 1, false, "10", CheckMaxUsers));
-            
-            
+
             
             fields[0].isSelected = true;
             fields[3].isValid = true;

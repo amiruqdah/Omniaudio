@@ -65,33 +65,43 @@ namespace Omniaudio.Pages
  ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝    ╚═╝  ╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝"
                 , ref rBuffer);
 
-            sDialog.Update();
-            sDialog.Draw();
-
+          
             if (notifyDialog != null)
             {
                 notifyDialog.Draw();
                 notifyDialog.Update();
             }
 
-            if (Global.cki.Key == ConsoleKey.Backspace)
+            if (dcDialog == null)
             {
-                ConsoleHelper.ClearBuffer(ref jBuffer);
-                Omniaudio.Managers.PageManager.Instance.Pop();
-                Omniaudio.Managers.PageManager.Instance.AddPage(new Menu(ref jBuffer));
-                Global.cki = new ConsoleKeyInfo();
-            }
+                sDialog.Update();
+                sDialog.Draw();
 
-            if (Global.cki.Key == ConsoleKey.C)
+
+                if (Global.cki.Key == ConsoleKey.Backspace)
+                {
+                    ConsoleHelper.ClearBuffer(ref jBuffer);
+                    Omniaudio.Managers.PageManager.Instance.Pop();
+                    Omniaudio.Managers.PageManager.Instance.AddPage(new Menu(ref jBuffer));
+                    Global.cki = new ConsoleKeyInfo();
+                }
+
+            }
+            if (dcDialog == null)
             {
-                dcDialog = new DirectConnectDialog((Console.BufferWidth - 50) / 2, 20, 50, 20, ref rBuffer, false);
-                Global.cki = new ConsoleKeyInfo();
+                if (Global.cki.Key == ConsoleKey.C)
+                {
+                    dcDialog = new DirectConnectDialog((Console.BufferWidth - 50) / 2, 20, 50, 20, ref rBuffer, false);
+                    dcDialog.destroyDialog += dcDialog_destroy;
+                    Global.cki = new ConsoleKeyInfo();
+                }
             }
 
             if (dcDialog != null)
             {
-                dcDialog.Update();
                 dcDialog.Draw();
+                dcDialog.Update();
+              
             }
 
 
@@ -110,7 +120,10 @@ namespace Omniaudio.Pages
             sDialog = null; // set to null for "early" GC
             Logger.Instance.Flush();
         }
-
+        private void dcDialog_destroy()
+        {
+            dcDialog = null;
+        }
         private void sDialog_connectionException()
         {
             notifyDialog = new NotifyDialog(5, 10, 160, 5, ref jBuffer, false, "test");
