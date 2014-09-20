@@ -9,7 +9,7 @@ using System.IO.Compression;
 
 namespace Omniaudio.Networking
 {
-    delegate void NetworkedEvent(byte[] audioData);
+    delegate void NetworkedEvent(byte[] audioData, int bitDepth);
 
     class MusicPlayer
     {
@@ -33,7 +33,7 @@ namespace Omniaudio.Networking
             }
         }
         // 1 chunk = 1 sec of music
-        public void SendAudioChunks(int chunkCount)
+        public void SendAudioChunks(int chunkCount, int bitDepth)
         {
             int count = averageBytesPerSecond * chunkCount;
             if (count > audioData.Length)
@@ -42,7 +42,7 @@ namespace Omniaudio.Networking
             }
             byte[] audioChunk = new byte[count];
             Array.Copy(audioData, 0, audioChunk, 0, count);
-            SendCompressedAudioChunk(audioChunk);
+            SendCompressedAudioChunk(audioChunk, bitDepth);
 
 
         }

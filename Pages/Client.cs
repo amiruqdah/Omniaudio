@@ -31,6 +31,7 @@ namespace Omniaudio.Pages
         private CHAR_INFO[,] cBuffer;
         private bool clientEnded;
 
+        private bool hasBeenInit = false;
         private string mUsername;
 
         //req
@@ -43,8 +44,8 @@ namespace Omniaudio.Pages
         private InputField chatField;
         private NotifyDialog nd;
 
-        //music req
-        private BufferedWaveProvider m_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(44100, 32, 2));
+        //music req 
+        WaveOut outputDevice = new WaveOut();
         private IWavePlayer m_waveOut;
         public Client(NetClient client)
         {
@@ -64,9 +65,12 @@ namespace Omniaudio.Pages
         
         public void Init()
         {
-           
-            m_bufferedWaveProvider.BufferLength = 300000;
-            m_bufferedWaveProvider.ClearBuffer();
+
+            outputDevice.DesiredLatency = 300;
+            outputDevice.NumberOfBuffers = 3;
+          
+            
+                                    
             reciever = new Thread(RecieveMessages);
             reciever.IsBackground = true;
 
@@ -95,7 +99,7 @@ namespace Omniaudio.Pages
             cDialog.Update();
             cDialog.Draw();
 
-            //Notify Dialg
+            //Notify Dialog
             if (nd != null)
             {
                 nd.Update();
@@ -160,30 +164,22 @@ namespace Omniaudio.Pages
                                     /*MUSIC HANDLES*/
                                 case MessageType.Audio_ByteData:
                                     ConsoleHelper.WriteLineInBuffer(new COORD(50, 50), "ok!", ref rBuffer);
-                                    m_bufferedWaveProvider.ClearBuffer();
+                                    int sampleRate = msg.ReadInt32();
                                     int count= msg.ReadInt32();
                                     msg.SkipPadBits();
                                     byte[] audioData = msg.ReadBytes(count);
                                     Debug.Write(audioData.Count());
                                     MemoryStream byteStream = new MemoryStream(audioData);
-                                    
+                                    BufferedWaveProvider m_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(sampleRate, 16, 2));
                                     m_bufferedWaveProvider.AddSamples(audioData, 0, audioData.Length);
                                     
                                     byteStream.Close();
                                     byteStream.Dispose();
 
-                                    int resampled_length = (int)((Double)audioData.Length * ((Double)11650 / (Double)112000));
-                                    var resampler = new MediaFoundationResampler(m_bufferedWaveProvider, 11650);
-                                    resampler.ResamplerQuality = 60;
-                                    //m_bufferedWaveProvider.AddSamples(audioData, 0, resampled_length);
-
-                                    WaveCallbackInfo callbackInfo = WaveCallbackInfo.NewWindow();
-                                    var outputDevice = new DirectSoundOut();    
-
-                                    // init and play waveOut
-                                    outputDevice.Init(m_bufferedWaveProvider);
-                                    outputDevice.Play();
-                                  
+                                        outputDevice.Init(m_bufferedWaveProvider);
+                                        outputDevice.Play();
+                                    
+                                    
 
                                     break;
                             }

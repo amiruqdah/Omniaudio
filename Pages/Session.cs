@@ -456,21 +456,25 @@ namespace Omniaudio.Pages
         {
             MusicPlayer plyr = new MusicPlayer(Environment.CurrentDirectory + "\\Playlists\\" + musicLoc);
             plyr.SendCompressedAudioChunk += new NetworkedEvent(MusicPLayer_SendAudioData);
-            plyr.SendAudioChunks(1); // 12 seconds of audio data
+            
             TagLib.File f = TagLib.File.Create(Environment.CurrentDirectory + "\\Playlists\\" + musicLoc);
+            plyr.SendAudioChunks(1,f.Properties.AudioSampleRate); // 12 seconds of audio data
+           
             string title = ExtensionMethods.ConvertStringArrayToString(f.Tag.Performers);
             uint year = f.Tag.Year;
             long length = f.Length;
+           
            // plyr.Play();
             ConsoleHelper.WriteLineInBuffer(new COORD(70, 50),title, ref rBuffer);
             ConsoleHelper.WriteLineInBuffer(new COORD(70, 51), year.ToString(), ref rBuffer);
             ConsoleHelper.WriteLineInBuffer(new COORD(70, 52), length.ToString(), ref rBuffer);
         }
 
-        private void MusicPLayer_SendAudioData(byte []chunkedAudioData)
+        private void MusicPLayer_SendAudioData(byte []chunkedAudioData, int bitDepth)
         {
             NetOutgoingMessage temp = server.CreateMessage();
             temp.Write((byte)MessageType.Audio_ByteData);
+            temp.Write(bitDepth);
             temp.Write(chunkedAudioData.Count());
             temp.WritePadBits();
             temp.Write(chunkedAudioData);
